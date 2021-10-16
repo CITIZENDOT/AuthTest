@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS AuthTest;
+USE AuthTest;
+-- @block
+CREATE TABLE IF NOT EXISTS Users (
+    userId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    firstName VARCHAR(255),
+    lastName VARCHAR(255),
+    userName VARCHAR(255) NOT NULL UNIQUE,
+    hashedPassword CHAR(60) NOT NULL
+)
