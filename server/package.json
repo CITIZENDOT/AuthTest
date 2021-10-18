@@ -15,9 +15,11 @@
     "mysql2": "^2.3.0"
   },
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "devStart": "concurrently -n server,client -c red,cyan \"yarn run dev\" \"cd ../client && yarn start\""
   },
   "devDependencies": {
+    "concurrently": "^6.3.0",
     "nodemon": "^2.0.13"
   }
 }

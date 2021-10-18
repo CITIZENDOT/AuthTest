@@ -1,38 +1,48 @@
 import React, { useState } from "react";
-import { Link, Redirect, useLocation } from "react-router-dom";
+
+import axios from "axios";
+import Cookies from "js-cookie";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import Container from "@mui/material/Container";
+
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { useAuth } from "../use-auth";
 
-export default function Login() {
-  const { logIn } = useAuth();
-  const [successRedirect, setSuccessRedirect] = useState(false);
-  const { state } = useLocation();
-
+export default function ChangePassword() {
   const [alert, setAlert] = useState({
-    severity: state ? state.severity : null,
-    message: state ? state.message : null,
+    severity: null,
+    message: null,
   });
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const { userName, password } = event.target;
+    const { currentPassword, newPassword } = event.target;
+
     try {
-      const response = await logIn(userName.value, password.value);
-      setSuccessRedirect(true);
+      const response = await axios.post(
+        `${process.env.REACT_APP_SERVER_URL}/user/change-password`,
+        {
+          currentPassword: currentPassword.value,
+          newPassword: newPassword.value,
+        },
+        {
+          headers: {
+            authorization: Cookies.get("token"),
+          },
+        }
+      );
+      setAlert({
+        severity: "info",
+        message: "Password Changed successfully",
+      });
     } catch (err) {
-      console.log(err.response);
       setAlert({
         severity: "error",
         message: err.response.data.message,
       });
     }
   };
-
-  if (successRedirect) return <Redirect to={state?.from || "/profile"} />;
 
   return (
     <Container
@@ -41,36 +51,36 @@ export default function Login() {
         marginTop: 5,
       }}
     >
-      <h1>Login</h1>
+      <h1>Change Password</h1>
       {alert.message && (
         <Alert severity={alert.severity}>{alert.message}</Alert>
       )}
       <form onSubmit={handleSubmit}>
         <Box>
           <TextField
-            name="userName"
+            name="currentPassword"
+            type="password"
             fullWidth
-            label="Username"
+            label="Current Password"
             variant="outlined"
             margin="normal"
           />
         </Box>
         <Box>
           <TextField
-            name="password"
+            name="newPassword"
             type="password"
             fullWidth
-            label="Password"
+            label="New Password"
             variant="outlined"
             margin="normal"
           />
         </Box>
         <Box>
           <Button type="submit" variant="contained" fullWidth>
-            Login
+            Change Password
           </Button>
         </Box>
-        <Link to="/register">Don't have account?</Link>
       </form>
     </Container>
   );

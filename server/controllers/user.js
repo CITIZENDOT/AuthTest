@@ -35,7 +35,22 @@ async function getUser(userName, password) {
   }
 }
 
+async function changePassword(userName, currentPassword, newPassword) {
+  try {
+    await getUser(userName, currentPassword);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const [result] = await db.execute(
+      "UPDATE Users SET hashedPassword = ? WHERE userName = ?",
+      [hashedPassword, userName]
+    );
+    return result.affectedRows == 1;
+  } catch (err) {
+    throw err;
+  }
+}
+
 module.exports = {
   insertUser: insertUser,
   getUser: getUser,
+  changePassword: changePassword,
 };

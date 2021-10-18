@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { getUser, insertUser } = require("../controllers/User");
+const { getUser, insertUser, changePassword } = require("../controllers/user");
 const { checkAuth } = require("../middlewares/user");
 const jwt = require("jsonwebtoken");
 
@@ -58,6 +58,28 @@ router.post("/register", async function (req, res) {
       return res.status(400).json({
         message: "User already exists with given username",
       });
+    return res.status(400).json({
+      message: err.message,
+    });
+  }
+});
+
+router.post("/change-password", checkAuth, async function (req, res) {
+  const { currentPassword, newPassword } = req.body;
+  try {
+    const changed = await changePassword(
+      req.user.userName,
+      currentPassword,
+      newPassword
+    );
+    if (!changed)
+      return res.status(500).json({
+        message: "Internal Server Error",
+      });
+    return res.status(200).json({
+      message: "Password changed successfully",
+    });
+  } catch (err) {
     return res.status(400).json({
       message: err.message,
     });

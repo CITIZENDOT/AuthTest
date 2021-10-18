@@ -1,4 +1,5 @@
-import React, { useRef } from "react";
+import React, { useState, useRef } from "react";
+import { Link, Redirect } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
@@ -8,6 +9,7 @@ import axios from "axios";
 
 export default function Register() {
   const formRef = useRef(null);
+  const [successRedirect, setSuccessRedirect] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -22,9 +24,24 @@ export default function Register() {
           password: password.value,
         }
       );
+      setSuccessRedirect(true);
       document.getElementById("register-form").reset();
     } catch (err) {}
   };
+
+  if (successRedirect) {
+    return (
+      <Redirect
+        to={{
+          pathname: "/login",
+          state: {
+            severity: "info",
+            message: "Your account has been created. You may now login.",
+          },
+        }}
+      />
+    );
+  }
 
   return (
     <Container
@@ -79,6 +96,7 @@ export default function Register() {
             Register
           </Button>
         </Box>
+        <Link to="/login">Already Have an account?</Link>
       </form>
     </Container>
   );
